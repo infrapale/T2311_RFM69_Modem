@@ -1,5 +1,3 @@
-#include "USB/USBAPI.h"
-
 #include "main.h"
 #include "uart.h"
 #include "json.h"
@@ -28,7 +26,9 @@ void uart_read_uart(void)
             uart.rx.avail = true;
             uart.rx.str.remove(uart.rx.str.length()-1);
         }
+        #ifdef DEBUG_PRINT
         Serial.println("rx is available");
+        #endif        
     }
 }
 
@@ -45,7 +45,10 @@ void uart_parse_rx_frame(void)
         (uart.rx.str.charAt(uart.rx.len-1) != '>'))  do_continue = false;
     if (do_continue)
     {   
+        #ifdef DEBUG_PRINT
         Serial.print("Buffer frame is OK\n");
+        #endif
+
         uart.rx.status = STATUS_CORRECT_FRAME;
         if ((uart.rx.str.charAt(6)  == '{') && 
             (uart.rx.str.charAt(uart.rx.len-2) == '}'))
@@ -100,12 +103,14 @@ void uart_build_node_tx_str(void)
     uart.rx.str = (char*) receive_p->radio_msg;  
     uart.tx.str = "<#X1a:";
     json_pick_data_from_rx(&uart);
-    // Serial.print("radio_msg: ");
-    // Serial.println(uart.rx.str);  
-    // Serial.println(uart.node.zone);
-    // Serial.println(uart.node.name);
-    // Serial.println(uart.node.value);
-    // Serial.println(uart.node.remark);
+    #ifdef DEBUG_PRINT
+    Serial.print("radio_msg: ");
+    Serial.println(uart.rx.str);  
+    Serial.println(uart.node.zone);
+    Serial.println(uart.node.name);
+    Serial.println(uart.node.value);
+    Serial.println(uart.node.remark);
+    #endif
     uart.tx.str += uart.node.zone;
     uart.tx.str += ';';
     uart.tx.str += uart.node.name;
@@ -179,7 +184,6 @@ void uart_print_rx_metadata(void)
     Serial.print("Address     "); Serial.println(uart.rx.addr);
     Serial.print("Command     "); Serial.println(uart.rx.cmd);
     Serial.print("Format      "); Serial.println(uart.rx.format);
-    //Serial.print("Cmd Format  "); Serial.println(uart.cmd_format);
 }    
 
 

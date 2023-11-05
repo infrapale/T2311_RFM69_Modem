@@ -2,9 +2,9 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-
-#define ADA_M0_RFM69 
-//#define PRO_MINI_RFM69
+// DEBUG_PRINT 
+//#define ADA_M0_RFM69 
+#define PRO_MINI_RFM69
 #include <Arduino.h>
 #include "rfm69.h"
 

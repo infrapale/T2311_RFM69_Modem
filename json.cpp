@@ -24,10 +24,12 @@ uint16_t json_convert_uart_node_to_json(char *buff, uart_msg_st *uart_p)
     //Serial.println(JsonString);
     json_len = JsonString.length();
     if (json_len <= MAX_MESSAGE_LEN){
-       //for (i=0;i<MAX_MESSAGE_LEN;i++) radio_packet[i]=0;
-       JsonString.toCharArray(buff, MAX_MESSAGE_LEN);
-       Serial.println(json_len);
-       return( json_len );
+        //for (i=0;i<MAX_MESSAGE_LEN;i++) radio_packet[i]=0;
+        JsonString.toCharArray(buff, MAX_MESSAGE_LEN);
+        #ifdef DEBUG_PRINT
+        Serial.println(json_len);
+        #endif       
+        return( json_len );
     }
     else {
       Serial.print("JSON string was too long for the radio packet: "); 

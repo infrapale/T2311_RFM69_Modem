@@ -40,14 +40,14 @@ void rfm_receive_message(void)
             if (receive_msg.len > 0)
             {
                 receive_msg.radio_msg[receive_msg.len] = 0;
+                #ifdef DEBUG_PRINT
                 Serial.print("Received [");Serial.print(receive_msg.len);Serial.print("]: ");
-                Serial.println((char*)receive_msg.radio_msg);
-                
+                Serial.println((char*)receive_msg.radio_msg);               
                 Serial.print("len: ");
                 Serial.print(receive_msg.len, DEC);
-
                 Serial.print("  RSSI: ");
                 Serial.println(rf69p->lastRssi(), DEC);
+                #endif
                 receive_msg.rssi = rf69p->lastRssi();
             }
         }

@@ -4,6 +4,7 @@
 #include <RH_RF69.h>
 #include <SPI.h>
 #include "rfm69.h"
+#include "secrets.h"
 
 extern RH_RF69 *rf69p;
 
@@ -16,8 +17,6 @@ void rfm69_initialize(RH_RF69 *rf69_ptr)
 
     pinMode(RFM69_RST, OUTPUT);
     digitalWrite(RFM69_RST, LOW);
-    
-    Serial.println("RFM69 TX Test!");
     digitalWrite(RFM69_RST, HIGH);    delay(100);
     digitalWrite(RFM69_RST, LOW);    delay(100);
 
@@ -35,7 +34,7 @@ void rfm69_initialize(RH_RF69 *rf69_ptr)
     // ishighpowermodule flag set like this:
     rf69p->setTxPower(20, true);  // range from 14-20 for power, 2nd arg must be true for 69HCW
  
-    uint8_t key[] ="VillaAstrid_2003"; //exactly the same 16 characters/bytes on all nodes!   
+    uint8_t key[] = RFM69_KEY; //exactly the same 16 characters/bytes on all nodes!   
     rf69p->setEncryptionKey(key);
   
     
