@@ -138,7 +138,7 @@ void setup()
     //while (!Serial); // wait until serial console is open, remove if not tethered to computer
     delay(2000);
     Serial.begin(9600);
-    Serial.println("T2310_M0_RFM69_Test");
+    Serial.println("T2311_RFM69_Modem");
     
     uart_initialize();
     uart_p = uart_get_data_ptr();
