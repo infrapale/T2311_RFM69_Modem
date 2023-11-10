@@ -2,11 +2,17 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
 
-// DEBUG_PRINT 
+//#define DEBUG_PRINT 
 //#define ADA_M0_RFM69 
 #define PRO_MINI_RFM69
 #include <Arduino.h>
 #include "rfm69.h"
+
+#ifdef  ADA_M0_RFM69
+#define SerialX  Serial1
+#else
+#define SerialX Serial
+#endif
 
 typedef struct
 {

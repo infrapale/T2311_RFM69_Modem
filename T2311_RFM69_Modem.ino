@@ -139,6 +139,7 @@ void setup()
     delay(2000);
     Serial.begin(9600);
     Serial.println("T2311_RFM69_Modem");
+    SerialX.begin(9600);
     
     uart_initialize();
     uart_p = uart_get_data_ptr();

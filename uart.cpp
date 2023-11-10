@@ -18,13 +18,13 @@ void uart_initialize(void)
 
 void uart_read_uart(void)
 {
-    if (Serial.available())
+    if (SerialX.available())
     {
-        uart.rx.str = Serial.readStringUntil('\n');
+        uart.rx.str = SerialX.readStringUntil('\n');
         if (uart.rx.str.length()> 0)
         {
             uart.rx.avail = true;
-            uart.rx.str.remove(uart.rx.str.length()-1);
+            //uart.rx.str.remove(uart.rx.str.length()-1);
         }
         #ifdef DEBUG_PRINT
         Serial.println("rx is available");
@@ -160,15 +160,15 @@ void uart_exec_cmnd(uart_cmd_et ucmd)
         case UART_CMD_GET_AVAIL:
             str[4] = UART_REPLY_AVAILABLE;
             if(rfm_receive_message_is_avail()) str[6] = '1';
-            Serial.println(str);
+            SerialX.println(str);
             break;
         case UART_CMD_READ_RAW:
             uart_build_raw_tx_str();
-            Serial.println(uart.tx.str);          
+            SerialX.println(uart.tx.str);          
             break;
         case UART_CMD_READ_NODE:
             uart_build_node_tx_str();
-            Serial.println(uart.tx.str);          
+            SerialX.println(uart.tx.str);          
           break;
 
     }
