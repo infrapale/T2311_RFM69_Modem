@@ -104,7 +104,7 @@ Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
 #include "secrets.h"
 #include <RH_RF69.h>
 #include <VillaAstridCommon.h>
-#include <SimpleTimer.h> 
+#include <TaHa.h> 
 #include <secrets.h>
 #include "json.h"
 #include "rfm69.h"
@@ -122,7 +122,8 @@ RH_RF69         rf69(RFM69_CS, RFM69_INT);
 RH_RF69         *rf69p;
 module_data_st  me = {'X','1'};
 time_type       MyTime = {2023, 11,01,1,01,55}; 
-SimpleTimer     timer;
+TaHa TaHa_1000ms;
+TaHa TaHa_10s;
 
 #ifdef PRO_MINI_RFM69
 AVR_Watchdog watchdog(4);
@@ -152,8 +153,8 @@ void setup()
     // Hard Reset the RFM module
     pinMode(LED, OUTPUT);
 
-    timer.setInterval(1000, run_1000ms);
-    timer.setInterval(10000, run_10s);
+    TaHa_1000ms.set_interval(1000, RUN_RECURRING, run_1000ms); 
+    TaHa_10s.set_interval(10000, RUN_RECURRING, run_10s); 
 
 
     #ifdef ADAFRUIT_FEATHER_M0
@@ -171,9 +172,12 @@ void setup()
 
 void loop() 
 {
+
     uart_read_uart();    // if available -> uart->prx.str uart->rx.avail
     if(uart_p->rx.avail)
     {
+        TaHa_1000ms.run();
+        TaHa_10s.run();
         uart_parse_rx_frame();
         #ifdef DEBUG_PRINT
         Serial.println(uart_p->rx.str);
