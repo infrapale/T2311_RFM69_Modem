@@ -1,6 +1,6 @@
-#include "WString.h"
 #ifndef __MAIN_H__
 #define __MAIN_H__
+#include "WString.h"
 
 //#define DEBUG_PRINT 
 //#define ADA_M0_RFM69 

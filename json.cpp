@@ -14,9 +14,9 @@ uint16_t json_convert_uart_node_to_json(char *buff, uart_msg_st *uart_p)
     JsonString += "\"S\":\"";
     JsonString += uart_p->node.name;  
     JsonString += "\",";
-    JsonString += "\"V\":";
+    JsonString += "\"V\":\"";
     JsonString += uart_p->node.value;
-    JsonString += ",";
+    JsonString += "\",";
     JsonString += "\"R\":\"";
     JsonString += uart_p->node.remark;
     JsonString += "\"}";
