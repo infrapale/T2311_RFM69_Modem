@@ -2,14 +2,14 @@
 #define __MAIN_H__
 #include "WString.h"
 
-//#define DEBUG_PRINT 
-//#define ADA_M0_RFM69 
-#define PRO_MINI_RFM69
+#define DEBUG_PRINT 
+#define ADA_M0_RFM69 
+// #define PRO_MINI_RFM69
 #include <Arduino.h>
 #include "rfm69.h"
 
 #ifdef  ADA_M0_RFM69
-#define SerialX  Serial1
+#define SerialX  Serial
 #else
 #define SerialX Serial
 #endif

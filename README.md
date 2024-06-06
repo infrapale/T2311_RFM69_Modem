@@ -18,3 +18,8 @@ UART Replies
 -  UART_REPLY_READ_RAW     = 'r',
 -  UART_REPLY_READ_NODE    = 'o' 
 
+
+<#X1T:Hello World>
+<#X1T:<*RLH_1=T>>
+<*RLH_1=T>
+<*RLH_2=T>
