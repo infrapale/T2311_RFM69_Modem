@@ -104,8 +104,7 @@ Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
 #include "secrets.h"
 #include <RH_RF69.h>
 #include <VillaAstridCommon.h>
-#include <TaHa.h> 
-#include <secrets.h>
+#include "atask.h"
 #include "json.h"
 #include "rfm69.h"
 #include "uart.h"
@@ -117,13 +116,31 @@ Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
 #define SERIAL_BAUD   9600
 #define ENCRYPTKEY    RFM69_KEY   // defined in secret.h
 #define LED           13  // onboard blinky
+//#define SEND_TEST_MSG 
+
 
 RH_RF69         rf69(RFM69_CS, RFM69_INT);
 RH_RF69         *rf69p;
 module_data_st  me = {'X','1'};
 time_type       MyTime = {2023, 11,01,1,01,55}; 
-TaHa TaHa_1000ms;
-TaHa TaHa_10s;
+
+#define NBR_TEST_MSG  4
+#define LEN_TEST_MSG  32
+const char test_msg[NBR_TEST_MSG][LEN_TEST_MSG] =
+{  //12345678901234567890123456789012
+    "<#X1N:ID1;Temp;21.0;->",
+    "<#X1N:ID2;Temp;22.0;->",
+    "<#X1N:ID3;Temp;23.0;->",
+    "<#X1N:ID4;Temp;24.0;->",
+};
+
+void debug_print_task(void);
+void run_1000ms(void);
+void send_test_data_task(void);
+
+atask_st debug_print_handle        = {"Debug Print    ", 5000,0, 0, 255, 0, 1, debug_print_task};
+atask_st clock_handle              = {"Clock Task     ", 1000,0, 0, 255, 0, 1, run_1000ms};
+atask_st send_test_data_handle     = {"Test Send Task ", 10000,0, 0, 255, 0, 1, send_test_data_task};
 
 #ifdef PRO_MINI_RFM69
 AVR_Watchdog watchdog(4);
@@ -132,6 +149,19 @@ AVR_Watchdog watchdog(4);
 rfm_receive_msg_st  *receive_p;
 rfm_send_msg_st     *send_p;
 uart_msg_st         *uart_p;
+
+
+
+void initialize_tasks(void)
+{
+  atask_initialize();
+  atask_add_new(&debug_print_handle);
+  atask_add_new(&clock_handle);
+  #ifdef SEND_TEST_MSG
+  atask_add_new(&send_test_data_handle);
+  #endif
+  Serial.print("Tasks initialized "); Serial.println(TASK_NBR_OF);
+}
 
 
 void setup() 
@@ -152,9 +182,7 @@ void setup()
 
     // Hard Reset the RFM module
     pinMode(LED, OUTPUT);
-
-    TaHa_1000ms.set_interval(1000, RUN_RECURRING, run_1000ms); 
-    TaHa_10s.set_interval(10000, RUN_RECURRING, run_10s); 
+    initialize_tasks();
 
 
     #ifdef ADAFRUIT_FEATHER_M0
@@ -172,12 +200,10 @@ void setup()
 
 void loop() 
 {
-
+    atask_run();  
     uart_read_uart();    // if available -> uart->prx.str uart->rx.avail
     if(uart_p->rx.avail)
     {
-        TaHa_1000ms.run();
-        TaHa_10s.run();
         uart_parse_rx_frame();
         #ifdef DEBUG_PRINT
         Serial.println(uart_p->rx.str);
@@ -199,10 +225,6 @@ void loop()
     #endif
 }
 
-void run_10s(void)
-{
-   
-}
 
 
 void run_1000ms(void)
@@ -217,4 +239,19 @@ void run_1000ms(void)
       }   
    }
 }
+
+void debug_print_task(void)
+{
+  atask_print_status(true);
+}
+
+void send_test_data_task(void)
+{
+    if  (send_test_data_handle.state >= NBR_TEST_MSG ) send_test_data_handle.state = 0;
+
+    uart_p->rx.str  = test_msg[send_test_data_handle.state];
+    uart_p->rx.avail = true;
+    send_test_data_handle.state++;
+}
+
 

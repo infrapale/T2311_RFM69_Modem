@@ -1,6 +1,7 @@
 #ifndef __RFM69_H__
 #define __RFM69_H__
 #include <RH_RF69.h>
+#include "main.h"
 
 //*********************************************************************************************
 // *********** IMPORTANT SETTINGS - YOU MUST CHANGE/ONFIGURE TO FIT YOUR HARDWARE *************

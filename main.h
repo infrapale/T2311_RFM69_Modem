@@ -4,15 +4,17 @@
 
 #define DEBUG_PRINT 
 #define ADA_M0_RFM69 
-// #define PRO_MINI_RFM69
+//#define PRO_MINI_RFM69
 #include <Arduino.h>
 #include "rfm69.h"
 
 #ifdef  ADA_M0_RFM69
-#define SerialX  Serial
+#define SerialX  Serial1
 #else
 #define SerialX Serial
 #endif
+
+#define TASK_NBR_OF  3
 
 typedef struct
 {
