@@ -39,6 +39,7 @@ void rfm_receive_message(void)
             receive_msg.avail = true;
             if (receive_msg.len > 0)
             {
+                if (receive_msg.len >= MAX_MESSAGE_LEN) receive_msg.len = MAX_MESSAGE_LEN -1;
                 receive_msg.radio_msg[receive_msg.len] = 0;
                 #ifdef DEBUG_PRINT
                 Serial.print("Received [");Serial.print(receive_msg.len);Serial.print("]: ");

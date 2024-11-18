@@ -84,6 +84,7 @@ UART Replies
 
 *******************************************************************************
 Sensor Radio Message:   {"Z":"OD_1","S":"Temp","V":23.1,"R":"-"}
+                        {"Z":"Dock","S":"T_dht22","V":"8.7","R":"-"}
 Relay Radio Message     {"Z":"MH1","S":"RKOK1","V":"T","R":"-"}
 Sensor Node Rx Mesage:  <#X1N:OD1;Temp;25.0;->
 Relay Node Rx Mesage:   <#X1N:RMH1;RKOK1;T;->
@@ -116,7 +117,6 @@ Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
 #define SERIAL_BAUD   9600
 #define ENCRYPTKEY    RFM69_KEY   // defined in secret.h
 #define LED           13  // onboard blinky
-//#define SEND_TEST_MSG 
 
 
 RH_RF69         rf69(RFM69_CS, RFM69_INT);
@@ -128,10 +128,10 @@ time_type       MyTime = {2023, 11,01,1,01,55};
 #define LEN_TEST_MSG  32
 const char test_msg[NBR_TEST_MSG][LEN_TEST_MSG] =
 {  //12345678901234567890123456789012
-    "<#X1N:ID1;Temp;21.0;->",
-    "<#X1N:ID2;Temp;22.0;->",
-    "<#X1N:ID3;Temp;23.0;->",
-    "<#X1N:ID4;Temp;24.0;->",
+    "<#X1N:Dock;T_bmp1;9.1;->",
+    "<#X1N:Dock;T_dht22;8.7;->",
+    "<#X1N:Dock;T_Water;5.3;->",
+    "<#X1N:Dock;ldr1;0.33;->",
 };
 
 void debug_print_task(void);
@@ -143,7 +143,7 @@ atask_st clock_handle              = {"Clock Task     ", 1000,0, 0, 255, 0, 1, r
 atask_st send_test_data_handle     = {"Test Send Task ", 10000,0, 0, 255, 0, 1, send_test_data_task};
 
 #ifdef PRO_MINI_RFM69
-AVR_Watchdog watchdog(4);
+//AVR_Watchdog watchdog(4);
 #endif
 
 rfm_receive_msg_st  *receive_p;
@@ -169,7 +169,10 @@ void setup()
     //while (!Serial); // wait until serial console is open, remove if not tethered to computer
     delay(2000);
     Serial.begin(9600);
-    Serial.println("T2311_RFM69_Modem");
+    Serial.print("T2311_RFM69_Modem"); Serial.print(" Compiled: ");
+    Serial.print(__DATE__); Serial.print(" ");
+    Serial.print(__TIME__); Serial.println();
+
     SerialX.begin(9600);
     
     uart_initialize();
@@ -190,7 +193,7 @@ void setup()
     wdt_init ( WDT_CONFIG_PER_16K );
     #endif
     #ifdef PRO_MINI_RFM69
-    watchdog.set_timeout(4);
+    //watchdog.set_timeout(4);
     #endif
 
 
@@ -221,7 +224,7 @@ void loop()
     wdt_reset();
     #endif
     #ifdef PRO_MINI_RFM69
-    watchdog.clear();
+    // watchdog.clear();
     #endif
 }
 
@@ -242,7 +245,7 @@ void run_1000ms(void)
 
 void debug_print_task(void)
 {
-  atask_print_status(true);
+  //atask_print_status(true);
 }
 
 void send_test_data_task(void)
