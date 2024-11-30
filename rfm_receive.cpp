@@ -38,7 +38,8 @@ void rfm_receive_message(void)
         {
             receive_msg.avail = true;
             if (receive_msg.len > 0)
-            {
+            {   
+                digitalWrite(PIN_LED_GREEN,HIGH); 
                 if (receive_msg.len >= MAX_MESSAGE_LEN) receive_msg.len = MAX_MESSAGE_LEN -1;
                 receive_msg.radio_msg[receive_msg.len] = 0;
                 #ifdef DEBUG_PRINT
@@ -50,6 +51,8 @@ void rfm_receive_message(void)
                 Serial.println(rf69p->lastRssi(), DEC);
                 #endif
                 receive_msg.rssi = rf69p->lastRssi();
+                digitalWrite(PIN_LED_GREEN,LOW); 
+
             }
         }
     }

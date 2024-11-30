@@ -20,6 +20,7 @@ void uart_read_uart(void)
 {
     if (SerialX.available())
     {
+        digitalWrite(PIN_LED_BLUE,HIGH); 
         uart.rx.str = SerialX.readStringUntil('\n');
         if (uart.rx.str.length()> 0)
         {
@@ -29,7 +30,8 @@ void uart_read_uart(void)
         #ifdef DEBUG_PRINT
         Serial.println("rx is available");
         #endif        
-    }
+    } else  digitalWrite(PIN_LED_BLUE,LOW); 
+
 }
 
 void uart_parse_rx_frame(void)
