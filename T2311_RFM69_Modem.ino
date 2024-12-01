@@ -192,7 +192,7 @@ void setup()
     digitalWrite(PIN_LED_GREEN, LOW);
     digitalWrite(PIN_LED_BLUE, LOW);
 
-    while(1) {
+    while(0) {
         digitalWrite(PIN_LED_RED, HIGH);
         delay(2000);
         digitalWrite(PIN_LED_GREEN, HIGH);
