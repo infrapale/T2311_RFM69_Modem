@@ -1,5 +1,6 @@
 #ifndef __RFM69_H__
 #define __RFM69_H__
+
 #include <RH_RF69.h>
 #include "main.h"
 
@@ -20,32 +21,7 @@
 
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF69_FREQ     434.0  //915.0
-#define LED_INDICATION
-
-#ifdef  ADA_M0_RFM69
-#define RFM69_CS      8
-#define RFM69_INT     3
-// #define RFM69_IRQN    0  // Pin 2 is IRQ 0!
-#define RFM69_RST     4
-#endif
-
-#ifdef PRO_MINI_RFM69
-#define RFM69_CS      10
-#define RFM69_INT     2
-#define RFM69_IRQN    0  // Pin 2 is IRQ 0!
-#define RFM69_RST     9
-#ifdef  LED_INDICATION
-#define PIN_LED_RED    4
-#define PIN_LED_GREEN  3
-#define PIN_LED_BLUE   5
-#endif
-#endif
 
 
-
-/// @brief  Initialize menu
-/// @note   Set opinter to the ohjecct
-/// @param  object pointer
-/// @return
 void rfm69_initialize(RH_RF69 *rf69_ptr);
 #endif

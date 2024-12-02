@@ -111,12 +111,12 @@ Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
 #include "uart.h"
 #include "rfm_receive.h"
 #include "rfm_send.h"
+#include "io.h"
 
 #define ZONE  "OD_1"
 //*********************************************************************************************
 #define SERIAL_BAUD   9600
 #define ENCRYPTKEY    RFM69_KEY   // defined in secret.h
-#define LED           13  // onboard blinky
 
 
 RH_RF69         rf69(RFM69_CS, RFM69_INT);
@@ -135,12 +135,18 @@ const char test_msg[NBR_TEST_MSG][LEN_TEST_MSG] =
 };
 
 void debug_print_task(void);
-void run_1000ms(void);
+void run_100ms(void);
 void send_test_data_task(void);
+void rfm_receive_task(void); 
+
 
 atask_st debug_print_handle        = {"Debug Print    ", 5000,0, 0, 255, 0, 1, debug_print_task};
-atask_st clock_handle              = {"Clock Task     ", 1000,0, 0, 255, 0, 1, run_1000ms};
-atask_st send_test_data_handle     = {"Test Send Task ", 10000,0, 0, 255, 0, 1, send_test_data_task};
+atask_st clock_handle              = {"Tick Task      ", 100,0, 0, 255, 0, 1, run_100ms};
+atask_st rfm_receive_handle        = {"Receive <- RFM ", 10000,0, 0, 255, 0, 1, rfm_receive_task};
+
+#ifdef SEND_TEST_MSG
+atask_st send_test_data_handle     = {"Send Test Task ", 10000,0, 0, 255, 0, 1, send_test_data_task};
+#endif
 
 #ifdef PRO_MINI_RFM69
 //AVR_Watchdog watchdog(4);
@@ -157,6 +163,8 @@ void initialize_tasks(void)
   atask_initialize();
   atask_add_new(&debug_print_handle);
   atask_add_new(&clock_handle);
+  atask_add_new(&rfm_receive_handle);
+
   #ifdef SEND_TEST_MSG
   atask_add_new(&send_test_data_handle);
   #endif
@@ -182,29 +190,8 @@ void setup()
     rf69p = &rf69;
     rfm69_initialize(&rf69);
     rfm_receive_initialize();
-
+    io_initialize();
     // Hard Reset the RFM module
-    pinMode(LED, OUTPUT);
-    pinMode(PIN_LED_RED, OUTPUT);
-    pinMode(PIN_LED_GREEN, OUTPUT);
-    pinMode(PIN_LED_BLUE, OUTPUT);
-    digitalWrite(PIN_LED_RED, LOW);
-    digitalWrite(PIN_LED_GREEN, LOW);
-    digitalWrite(PIN_LED_BLUE, LOW);
-
-    while(0) {
-        digitalWrite(PIN_LED_RED, HIGH);
-        delay(2000);
-        digitalWrite(PIN_LED_GREEN, HIGH);
-        delay(2000);
-        digitalWrite(PIN_LED_BLUE, HIGH);
-        delay(2000);
-        
-        digitalWrite(PIN_LED_RED, LOW);
-        digitalWrite(PIN_LED_GREEN, LOW);
-        digitalWrite(PIN_LED_BLUE, LOW);
-        delay(2000);
-    }
     
     initialize_tasks();
 
@@ -225,6 +212,11 @@ void setup()
 void loop() 
 {
     atask_run();  
+}
+
+
+void rfm_receive_task(void) 
+{
     uart_read_uart();    // if available -> uart->prx.str uart->rx.avail
     if(uart_p->rx.avail)
     {
@@ -240,7 +232,6 @@ void loop()
         uart_p->rx.avail = false;
     }
     rfm_receive_message();
-    delay(1000);
     #ifdef ADAFRUIT_FEATHER_M0
     wdt_reset();
     #endif
@@ -250,18 +241,26 @@ void loop()
 }
 
 
-
-void run_1000ms(void)
+void run_100ms(void)
 {
-   if (++MyTime.second > 59 ){
-      MyTime.second = 0;
-      if (++MyTime.minute > 59 ){    
-         MyTime.minute = 0;
-         if (++MyTime.hour > 23){
-            MyTime.hour = 0;
-         }
-      }   
-   }
+    static uint8_t ms100 = 0;
+    if (++ms100 >= 10 )
+    {
+        ms100 = 0;
+        if (++MyTime.second > 59 )
+        {
+          MyTime.second = 0;
+          if (++MyTime.minute > 59 )
+          {    
+            MyTime.minute = 0;
+            if (++MyTime.hour > 23)
+            {
+                MyTime.hour = 0;
+            }
+          }   
+      }
+    }
+    io_run_100ms();
 }
 
 void debug_print_task(void)
@@ -269,6 +268,7 @@ void debug_print_task(void)
   //atask_print_status(true);
 }
 
+#ifdef SEND_TEST_MSG
 void send_test_data_task(void)
 {
     if  (send_test_data_handle.state >= NBR_TEST_MSG ) send_test_data_handle.state = 0;
@@ -277,5 +277,5 @@ void send_test_data_task(void)
     uart_p->rx.avail = true;
     send_test_data_handle.state++;
 }
-
+#endif
 

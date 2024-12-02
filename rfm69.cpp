@@ -1,4 +1,5 @@
 #include "main.h"
+#include "io.h"
 #include <Arduino.h>
 #include <Wire.h>
 #include <RH_RF69.h>

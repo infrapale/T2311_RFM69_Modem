@@ -16,6 +16,7 @@
 #endif
 
 #define TASK_NBR_OF  3
+//#define LED_INDICATION
 
 typedef struct
 {

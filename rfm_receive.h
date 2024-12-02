@@ -2,6 +2,7 @@
 #define __RFM_RECEIVE_H__
 
 #include "rfm69.h"
+#include "io.h"
 
 typedef struct
 {
@@ -34,6 +35,8 @@ void rfm_receive_message(void);
 /// @param
 /// @return
 bool rfm_receive_message_is_avail(void);
+
+void rfm_receive_clr_message_flag(void);
 
 
 #endif

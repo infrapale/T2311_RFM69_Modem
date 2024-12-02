@@ -3,6 +3,7 @@
 #include "json.h"
 #include "rfm_receive.h"
 #include "rfm_send.h"
+#include "io.h"
 
 uart_msg_st         uart;
 
@@ -20,7 +21,7 @@ void uart_read_uart(void)
 {
     if (SerialX.available())
     {
-        digitalWrite(PIN_LED_BLUE,HIGH); 
+        io_led_flash(LED_INDX_BLUE,20);
         uart.rx.str = SerialX.readStringUntil('\n');
         if (uart.rx.str.length()> 0)
         {
@@ -30,7 +31,7 @@ void uart_read_uart(void)
         #ifdef DEBUG_PRINT
         Serial.println("rx is available");
         #endif        
-    } else  digitalWrite(PIN_LED_BLUE,LOW); 
+    } 
 
 }
 
@@ -154,9 +155,11 @@ void uart_exec_cmnd(uart_cmd_et ucmd)
     switch(ucmd)
     {
         case UART_CMD_TRANSMIT_RAW:
+            io_led_flash(LED_INDX_RED, 10);
             uart_rx_send_rfm_from_raw();
             break;
         case UART_CMD_TRANSMIT_NODE:
+            io_led_flash(LED_INDX_RED, 20);
             uart_rx_send_rfm_from_node();
             break;
         case UART_CMD_GET_AVAIL:
@@ -165,10 +168,12 @@ void uart_exec_cmnd(uart_cmd_et ucmd)
             SerialX.println(str);
             break;
         case UART_CMD_READ_RAW:
+            rfm_receive_clr_message_flag();
             uart_build_raw_tx_str();
             SerialX.println(uart.tx.str);          
             break;
         case UART_CMD_READ_NODE:
+            rfm_receive_clr_message_flag();
             uart_build_node_tx_str();
             SerialX.println(uart.tx.str);          
           break;
