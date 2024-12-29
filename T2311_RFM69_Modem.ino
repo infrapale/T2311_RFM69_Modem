@@ -87,6 +87,9 @@ Sensor Radio Message:   {"Z":"OD_1","S":"Temp","V":23.1,"R":"-"}
                         {"Z":"Dock","S":"T_dht22","V":"8.7","R":"-"}
 Relay Radio Message     {"Z":"MH1","S":"RKOK1","V":"T","R":"-"}
 Sensor Node Rx Mesage:  <#X1N:OD1;Temp;25.0;->
+Sensor Node Rx Mesage:  <#X1N:Dock;T_bmp180;5.1;->
+Sensor Node Rx Mesage:  <#X1N:Dock;T_Water;3.2;->
+
 Relay Node Rx Mesage:   <#X1N:RMH1;RKOK1;T;->
 
 Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
@@ -96,7 +99,7 @@ Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
 
 #include <Arduino.h>
 #include "main.h"
-#ifdef ADAFRUIT_FEATHER_M0
+#if defined(ADA_M0_RFM69) | defined(ADA_RFM69_WING)
 #include <wdt_samd21.h>
 #endif
 #ifdef PRO_MINI_RFM69
@@ -142,7 +145,7 @@ void rfm_receive_task(void);
 
 atask_st debug_print_handle        = {"Debug Print    ", 5000,0, 0, 255, 0, 1, debug_print_task};
 atask_st clock_handle              = {"Tick Task      ", 100,0, 0, 255, 0, 1, run_100ms};
-atask_st rfm_receive_handle        = {"Receive <- RFM ", 10000,0, 0, 255, 0, 1, rfm_receive_task};
+atask_st rfm_receive_handle        = {"Receive <- RFM ", 100,0, 0, 255, 0, 1, rfm_receive_task};
 
 #ifdef SEND_TEST_MSG
 atask_st send_test_data_handle     = {"Send Test Task ", 10000,0, 0, 255, 0, 1, send_test_data_task};
@@ -177,11 +180,12 @@ void setup()
     //while (!Serial); // wait until serial console is open, remove if not tethered to computer
     delay(2000);
     Serial.begin(9600);
+    SerialX.begin(9600);
+
     Serial.print("T2311_RFM69_Modem"); Serial.print(" Compiled: ");
     Serial.print(__DATE__); Serial.print(" ");
     Serial.print(__TIME__); Serial.println();
 
-    SerialX.begin(9600);
     
     uart_initialize();
     uart_p = uart_get_data_ptr();
@@ -195,28 +199,29 @@ void setup()
     
     initialize_tasks();
 
-
-    #ifdef ADAFRUIT_FEATHER_M0
+    #if defined(ADA_M0_RFM69) | defined(ADA_RFM69_WING)
     // Initialze WDT with a 2 sec. timeout
-    wdt_init ( WDT_CONFIG_PER_16K );
+    // wdt_init ( WDT_CONFIG_PER_16K );
     #endif
     #ifdef PRO_MINI_RFM69
     //watchdog.set_timeout(4);
     #endif
 
-
+    SerialX.println("Bluetooth Relay");
 }
 
 
 
 void loop() 
 {
+    //SerialX.println("Hello World"); delay(4000);
     atask_run();  
 }
 
 
 void rfm_receive_task(void) 
 {
+    //SerialX.print("@");
     uart_read_uart();    // if available -> uart->prx.str uart->rx.avail
     if(uart_p->rx.avail)
     {
@@ -232,8 +237,8 @@ void rfm_receive_task(void)
         uart_p->rx.avail = false;
     }
     rfm_receive_message();
-    #ifdef ADAFRUIT_FEATHER_M0
-    wdt_reset();
+    #if defined(ADA_M0_RFM69) | defined(ADA_RFM69_WING)
+    //wdt_reset();
     #endif
     #ifdef PRO_MINI_RFM69
     // watchdog.clear();
@@ -265,7 +270,7 @@ void run_100ms(void)
 
 void debug_print_task(void)
 {
-  //atask_print_status(true);
+  atask_print_status(true);
 }
 
 #ifdef SEND_TEST_MSG

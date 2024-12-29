@@ -3,20 +3,21 @@
 #include "WString.h"
 
 //#define DEBUG_PRINT 
+#define BLUETOOTH_RELAY
 //#define SEND_TEST_MSG 
-//#define ADA_M0_RFM69 
-#define PRO_MINI_RFM69
+//#define ADA_M0_RFM69
+#define ADA_RFM69_WING
+//#define PRO_MINI_RFM69
 #include <Arduino.h>
 #include "rfm69.h"
-
-#ifdef  ADA_M0_RFM69
+#if defined(ADA_M0_RFM69) | defined(ADA_RFM69_WING)
 #define SerialX  Serial1
 #else
 #define SerialX Serial
 #endif
 
 #define TASK_NBR_OF  3
-//#define LED_INDICATION
+#define LED_INDICATION
 
 typedef struct
 {

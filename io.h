@@ -7,6 +7,12 @@
 // #define RFM69_IRQN    0  // Pin 2 is IRQ 0!
 #define RFM69_RST     4
 #endif
+#ifdef  ADA_RFM69_WING
+#define RFM69_CS      10
+#define RFM69_INT     6
+// #define RFM69_IRQN    0  // Pin 2 is IRQ 0!
+#define RFM69_RST     11
+#endif
 
 #ifdef PRO_MINI_RFM69
 #define RFM69_CS      10
