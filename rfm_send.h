@@ -19,4 +19,6 @@ rfm_send_msg_st *rfm_send_get_data_ptr(void);
 /// @return
 void rfm_send_radiate_msg( char *radio_msg );
 
+void rfm_send_task(void);
+
 #endif

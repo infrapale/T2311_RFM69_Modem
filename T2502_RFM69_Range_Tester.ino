@@ -146,6 +146,8 @@ void rfm_receive_task(void);
 atask_st debug_print_handle        = {"Debug Print    ", 5000,0, 0, 255, 0, 1, debug_print_task};
 atask_st clock_handle              = {"Tick Task      ", 100,0, 0, 255, 0, 1, run_100ms};
 atask_st rfm_receive_handle        = {"Receive <- RFM ", 100,0, 0, 255, 0, 1, rfm_receive_task};
+atask_st rfm_send_handle           = {"Send -> RFM    ", 10000,0, 0, 255, 0, 1, rfm_send_task};
+
 
 #ifdef SEND_TEST_MSG
 atask_st send_test_data_handle     = {"Send Test Task ", 10000,0, 0, 255, 0, 1, send_test_data_task};
@@ -167,6 +169,7 @@ void initialize_tasks(void)
   atask_add_new(&debug_print_handle);
   atask_add_new(&clock_handle);
   atask_add_new(&rfm_receive_handle);
+  atask_add_new(&rfm_send_handle);
 
   #ifdef SEND_TEST_MSG
   atask_add_new(&send_test_data_handle);
