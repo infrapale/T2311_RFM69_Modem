@@ -6,8 +6,8 @@
 #define BLUETOOTH_RELAY
 //#define SEND_TEST_MSG 
 //#define ADA_M0_RFM69
-#define ADA_RFM69_WING
-//#define PRO_MINI_RFM69
+//#define ADA_RFM69_WING
+#define PRO_MINI_RFM69
 #include <Arduino.h>
 #include "rfm69.h"
 #if defined(ADA_M0_RFM69) | defined(ADA_RFM69_WING)
@@ -18,6 +18,7 @@
 
 #define TASK_NBR_OF  3
 #define LED_INDICATION
+
 
 typedef struct
 {

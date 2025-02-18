@@ -39,6 +39,8 @@ void rfm_receive_message(void)
             receive_msg.avail = true;
             if (receive_msg.len > 0)
             {   
+                receive_msg.rssi = rf69p->lastRssi();
+                receive_msg.reply_sent = false;
                 io_led_flash(LED_INDX_GREEN,20); 
                 if (receive_msg.len >= MAX_MESSAGE_LEN) receive_msg.len = MAX_MESSAGE_LEN -1;
                 receive_msg.radio_msg[receive_msg.len] = 0;
@@ -53,7 +55,7 @@ void rfm_receive_message(void)
                 Serial.print("  RSSI: ");
                 Serial.println(rf69p->lastRssi(), DEC);
                 #endif
-                receive_msg.rssi = rf69p->lastRssi();
+                //rf69p->rssiRead()
 
             }
         }

@@ -10,6 +10,7 @@ typedef struct
     uint8_t         len;
     bool            avail;
     int8_t          rssi;
+    bool            reply_sent;
 } rfm_receive_msg_st;
 
 

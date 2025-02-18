@@ -37,7 +37,7 @@ void rfm69_initialize(RH_RF69 *rf69_ptr)
     }
     // If you are using a high power RF69 eg RFM69HW, you *must* set a Tx power with the
     // ishighpowermodule flag set like this:
-    rf69p->setTxPower(20, true);  // range from 14-20 for power, 2nd arg must be true for 69HCW
+    rf69p->setTxPower(14, true);  // range from 14-20 for power, 2nd arg must be true for 69HCW
  
     uint8_t key[] = RFM69_KEY; //exactly the same 16 characters/bytes on all nodes!   
     rf69p->setEncryptionKey(key);
