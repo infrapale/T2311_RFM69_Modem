@@ -40,8 +40,6 @@ Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
 #include "json.h"
 #include "rfm69.h"
 #include "uart.h"
-#include "rfm_receive.h"
-#include "rfm_send.h"
 #include "io.h"
 
 #define ZONE  "OD_1"
@@ -108,7 +106,7 @@ void setup()
     //while (!Serial); // wait until serial console is open, remove if not tethered to computer
     delay(2000);
     Serial.begin(9600);
-    Serial.print("T2512_RFM69_Modem"); Serial.print(" Compiled: ");
+    Serial.print(__APP__); Serial.print(F(" Compiled: "));
     Serial.print(__DATE__); Serial.print(" ");
     Serial.print(__TIME__); Serial.println();
 
@@ -121,8 +119,7 @@ void setup()
 
     rf69p = &rf69;
     rfm69_initialize(&rf69);
-    rfm_receive_initialize();
-    rfm_send_radiate_msg("T2512_RFM69_Modem");
+    rfm_send_radiate_msg(__APP__);
 
     io_initialize();
     // Hard Reset the RFM module

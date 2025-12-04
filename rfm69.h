@@ -24,4 +24,56 @@
 
 
 void rfm69_initialize(RH_RF69 *rf69_ptr);
+
+
+typedef struct
+{
+    char            radio_msg[MAX_MESSAGE_LEN];
+    uint8_t         len;
+    bool            avail;
+    int8_t          rssi;
+} rfm_receive_msg_st;
+
+/// @brief  Get pointer to module data
+/// @note
+/// @param
+/// @return pointer
+rfm_receive_msg_st *rfm_receive_get_data_ptr(void);
+
+/// @brief  Receive message when available
+/// @note   save message in radio_msg
+/// @param  -
+/// @return -
+void rfm_receive_message(void);
+
+/// @brief  Check if a radio message is available
+/// @note
+/// @param
+/// @return
+bool rfm_receive_message_is_avail(void);
+
+void rfm_receive_clr_message_flag(void);
+
+int16_t rfm69_get_last_rssi(void);
+
+typedef struct
+{
+    char            radio_msg[MAX_MESSAGE_LEN];
+} rfm_send_msg_st;
+
+
+/// @brief  Get pointer to module data 
+/// @note   
+/// @return pointer to data
+rfm_send_msg_st *rfm_send_get_data_ptr(void);
+
+/// @brief  Send message
+/// @param  message to send
+/// @return
+void rfm_send_radiate_msg( char *radio_msg );
+
+
+
+
+
 #endif

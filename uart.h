@@ -7,7 +7,7 @@ typedef enum
 {
     UART_FRAME_START        = '<',
     UART_FRAME_END          = '>',
-    UART_FRAME_DUMMY        = '-'
+    UART_FRAME_DUMMY        = '*'
 } uart_frame_et;
 
 typedef enum
@@ -31,7 +31,8 @@ typedef enum
     UART_CMD_TRANSMIT_NODE  = 'J',
     UART_CMD_GET_AVAIL      = 'A',
     UART_CMD_READ_RAW       = 'R',
-    UART_CMD_READ_NODE      = 'D' 
+    UART_CMD_READ_NODE      = 'D', 
+    UART_CMD_GET_RSSI       = 'I',
 } uart_cmd_et;
 
 typedef enum

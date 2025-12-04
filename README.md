@@ -38,6 +38,7 @@ UART Command Syntax
       D Read Decoded Message
       T Transmit Raw Message
       J Send Desoced Message as json
+      I Get last RSSI
       S Set parameter
     Index
       0-9
@@ -48,20 +49,24 @@ UART Command Syntax
       reply: ':'
     Value
       Total max 61 characters for RFM69
+      '*'  Not applicable or relevant
 
 *******************************************************************************
 
     Examples:
       Check if we have available messages:  
-          <R1X1A0?->  
+          <R1X1A0?*>  
           <X1R1A0:1>    1 message is available   
+      Get Last RSSI:  
+          <R1X1I0?*>  
+          <X1R1I0:-34>    1 message is available   
       Read raw messages:      
-          <R1X1R0?->   
+          <R1X1R0?*>   
           <X1R1R0:{"Z":"MH1","S":"RKOK1","V":"T","R":"-"}>
       Read decoded messages:  
-          <R1X1D0?->
+          <R1X1D0?*>
           <X1R1D0:OD_1;Temp;23.1;->
-          <X1R1D0:->    No message available
+          <X1R1D0:*>    No message available
       Transmit Raw Message
           <R1X1T0={"Z":"MH1","S":"RKOK1","V":"T","R":"-"}>
           +-+-+-  {"Z":"MH1","S":"RKOK1","V":"T","R":"-"}

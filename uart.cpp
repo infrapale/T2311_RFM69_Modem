@@ -1,8 +1,7 @@
 #include "main.h"
 #include "uart.h"
 #include "json.h"
-#include "rfm_receive.h"
-#include "rfm_send.h"
+#include "rfm69.h"
 #include "io.h"
 #include "atask.h"
 
@@ -124,9 +123,6 @@ void uart_build_node_from_rx_str(void)
 }
 
 
-
-
-
 void uart_build_node_tx_str(void)
 {
     uart_prepare_reply();
@@ -199,6 +195,19 @@ void uart_exec_cmnd(uart_cmd_et ucmd)
             uart_prepare_reply(); 
             if(rfm_receive_message_is_avail()) uart.tx.msg[UART_FRAME_POS_DATA] = '1';
             else uart.tx.msg[UART_FRAME_POS_DATA] = '0';
+            SerialX.println(uart.tx.msg);
+            break;
+        case UART_CMD_GET_RSSI:
+            uart_prepare_reply(); 
+            if(rfm_receive_message_is_avail()){
+                String Str = String(rfm69_get_last_rssi());
+                Str.toCharArray(&uart.tx.msg[UART_FRAME_POS_DATA], UART_MAX_REPLY_LEN - UART_FRAME_POS_DATA -3);
+                //Serial.println(uart.tx.msg);
+                uint8_t len = strlen(uart.tx.msg);
+                uart.tx.msg[len] = UART_FRAME_END;
+                uart.tx.msg[len+1] = 0x00;
+            }
+            else uart.tx.msg[UART_FRAME_POS_DATA] = UART_FRAME_DUMMY;
             SerialX.println(uart.tx.msg);
             break;
         case UART_CMD_READ_RAW:
