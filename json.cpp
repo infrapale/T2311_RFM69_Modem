@@ -107,8 +107,8 @@ String json_parse_tag(String json_str, const char *tag){
 
 void json_pick_data_from_rx(uart_msg_st *uart_p)
 {
-    uart_p->node.zone   = json_parse_tag(uart_p->rx.str, "{\"Z");
-    uart_p->node.name   = json_parse_tag(uart_p->rx.str, ",\"S");
-    uart_p->node.value  = json_parse_tag(uart_p->rx.str, ",\"V");
-    uart_p->node.remark = json_parse_tag(uart_p->rx.str, ",\"R");
+//     uart_p->node.zone   = json_parse_tag(uart_p->rx.str, "{\"Z");
+//     uart_p->node.name   = json_parse_tag(uart_p->rx.str, ",\"S");
+//     uart_p->node.value  = json_parse_tag(uart_p->rx.str, ",\"V");
+//     uart_p->node.remark = json_parse_tag(uart_p->rx.str, ",\"R");
 }

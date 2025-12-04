@@ -1,14 +1,37 @@
 #ifndef __UART_H__
 #define __UART_H__
 #define UART_MAX_BLOCK_LEN  8
+#define UART_MAX_REPLY_LEN  80
+
+typedef enum
+{
+    UART_FRAME_START        = '<',
+    UART_FRAME_END          = '>',
+    UART_FRAME_DUMMY        = '-'
+} uart_frame_et;
+
+typedef enum
+{
+    UART_FRAME_POS_START        = 0,
+    UART_FRAME_POS_TO_TAG,
+    UART_FRAME_POS_TO_ADDR,
+    UART_FRAME_POS_FROM_TAG,
+    UART_FRAME_POS_FROM_ADDR,
+    UART_FRAME_POS_FUNC,
+    UART_FRAME_POS_INDEX,
+    UART_FRAME_POS_ACTION,
+    UART_FRAME_POS_DATA,
+    UART_FRAME_POS_END,
+} uart_frame_pos_et;
+
 
 typedef enum
 {
     UART_CMD_TRANSMIT_RAW   = 'T',
-    UART_CMD_TRANSMIT_NODE  = 'N',
+    UART_CMD_TRANSMIT_NODE  = 'J',
     UART_CMD_GET_AVAIL      = 'A',
     UART_CMD_READ_RAW       = 'R',
-    UART_CMD_READ_NODE      = 'O' 
+    UART_CMD_READ_NODE      = 'D' 
 } uart_cmd_et;
 
 typedef enum
@@ -18,25 +41,38 @@ typedef enum
     UART_REPLY_READ_NODE    = 'o' 
 } uart_reply_et;
 
+typedef enum
+{
+    UART_ACTION_GET    = '?',
+    UART_ACTION_SET    = '=',
+    UART_ACTION_REPLY  = ':' 
+} uart_action_et;
+
+typedef struct 
+{
+    char            tag;
+    char            addr;     
+    char            from_tag;
+    char            from_addr; 
+    char            function;
+    char            index;   
+    char            action;
+}   msg_frame_st;
 
 typedef struct
 {
-    String          str;
-    char            radio_msg[MAX_MESSAGE_LEN];
+    char            msg[MAX_MESSAGE_LEN];
     uint8_t         len;
     bool            avail;
-    char            module;
-    char            addr;         
+    msg_frame_st    frame;
     uart_cmd_et     cmd;
     msg_format_et   format;
-    //msg_format_et   cmd_format;
     msg_status_et   status;
 } uart_rx_st;
 
 typedef struct
 {
-    String          str;
-    //char            radio_msg[MAX_MESSAGE_LEN];
+    char            msg[UART_MAX_REPLY_LEN];
     uint8_t         len;
     bool            avail;
     char            module;
@@ -98,6 +134,5 @@ void uart_rx_build_rfm_array(void);
 /// @param  UART command
 /// @return
 void uart_exec_cmnd(uart_cmd_et ucmd);
-
 
 #endif

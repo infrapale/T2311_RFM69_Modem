@@ -10,7 +10,7 @@
 #define NETWORKID         100  //the same on all nodes that talk to each other
 #define NODEID            10  
 #define BROADCAST         255
-#define MAX_MESSAGE_LEN   72
+#define MAX_MESSAGE_LEN   61
 #define RECEIVER          BROADCAST    // The recipient of packets
 //Match frequency to the hardware version of the radio on your Feather
 //#define FREQUENCY       RF69_433MHZ

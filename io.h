@@ -19,7 +19,7 @@
 #define LED_NBR_OF      4
 #define PIN_LED_RED     5
 #define PIN_LED_GREEN   4
-#define PIN_LED_BLUE    3
+#define PIN_LED_BLUE    A7
 
 typedef enum
 {

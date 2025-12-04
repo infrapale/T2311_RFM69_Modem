@@ -24,6 +24,8 @@ uint16_t json_convert_sensor_float_to_json(
     float value, 
     const char *remark );
 
+String json_parse_tag(String json_str, const char *tag);
+
 
 /// @brief  Pick data from UART Rx string
 /// @param  Pointer to UART data

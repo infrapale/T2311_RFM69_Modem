@@ -23,18 +23,17 @@ void io_initialize(void)
     digitalWrite(PIN_LED_ONBOARD, LOW);
 
     #ifdef  LED_INDICATION
-    pinMode(PIN_LED_RED, OUTPUT);
-    pinMode(PIN_LED_GREEN, OUTPUT);
+    //pinMode(PIN_LED_RED, OUTPUT);
+    //pinMode(PIN_LED_GREEN, OUTPUT);
     pinMode(PIN_LED_BLUE, OUTPUT);
-    digitalWrite(PIN_LED_RED, LOW);
-    digitalWrite(PIN_LED_GREEN, LOW);
+    //digitalWrite(PIN_LED_RED, LOW);
+    //digitalWrite(PIN_LED_GREEN, LOW);
     digitalWrite(PIN_LED_BLUE, LOW);
     // digitalWrite(PIN_LED_RED, HIGH);   delay(1000);
     // digitalWrite(PIN_LED_GREEN, HIGH); delay(1000);
-    // digitalWrite(PIN_LED_BLUE, HIGH);  delay(1000);    
     // digitalWrite(PIN_LED_RED, LOW); digitalWrite(PIN_LED_GREEN, LOW);  digitalWrite(PIN_LED_BLUE, LOW);
     #endif
-    io_led_flash(LED_INDX_GREEN,10);
+    io_led_flash(LED_INDX_BLUE,10);
 
 }
 
