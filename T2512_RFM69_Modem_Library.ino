@@ -37,9 +37,10 @@ Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
 #include <RH_RF69.h>
 #include <VillaAstridCommon.h>
 #include "atask.h"
-#include "json.h"
-#include "rfm69.h"
-#include "uart.h"
+#include "Rfm69Modem.h"
+// #include "json.h"
+// #include "rfm69.h"
+// #include "uart.h"
 #include "io.h"
 
 #define ZONE  "OD_1"
@@ -49,7 +50,10 @@ Relay Mesage      <#R12=x>   x:  0=off, 1=on, T=toggle
 
 
 RH_RF69         rf69(RFM69_CS, RFM69_INT);
-RH_RF69         *rf69p;
+Rfm69Modem      rfm69_modem(&rf69, RFM69_RST, PIN_LED_ONBOARD );
+
+// RH_RF69         rf69(RFM69_CS, RFM69_INT);
+// RH_RF69         *rf69p;
 module_data_st  module = {MY_MODULE_TAG, MY_MODULE_ADDR};
 time_type       MyTime = {2023, 11,01,1,01,55}; 
 
@@ -67,12 +71,13 @@ void debug_print_task(void);
 void run_100ms(void);
 void send_test_data_task(void);
 void rfm_receive_task(void); 
+void modem_task(void);
 
 
 atask_st debug_print_handle        = {"Debug Print    ", 5000,0, 0, 255, 0, 1, debug_print_task};
 atask_st clock_handle              = {"Tick Task      ", 100,0, 0, 255, 0, 1, run_100ms};
-atask_st rfm_receive_handle        = {"Receive <- RFM ", 500,0, 0, 255, 0, 1, rfm_receive_task};
-
+//atask_st rfm_receive_handle        = {"Receive <- RFM ", 500,0, 0, 255, 0, 1, rfm_receive_task};
+atask_st modem_handle              = {"Radio Modem    ", 100,0, 0, 255, 0, 1, modem_task};
 #ifdef SEND_TEST_MSG
 atask_st send_test_data_handle     = {"Send Test Task ", 10000,0, 0, 255, 0, 1, send_test_data_task};
 #endif
@@ -81,23 +86,16 @@ atask_st send_test_data_handle     = {"Send Test Task ", 10000,0, 0, 255, 0, 1, 
 //AVR_Watchdog watchdog(4);
 #endif
 
-rfm_receive_msg_st  *receive_p;
-rfm_send_msg_st     *send_p;
-uart_msg_st         *uart_p;
-
-
 
 void initialize_tasks(void)
 {
-
   atask_add_new(&debug_print_handle);
   atask_add_new(&clock_handle);
-  atask_add_new(&rfm_receive_handle);
-
+  atask_add_new(&modem_handle);
   #ifdef SEND_TEST_MSG
   atask_add_new(&send_test_data_handle);
   #endif
-  Serial.print("Tasks initialized "); Serial.println(TASK_NBR_OF);
+
 }
 
 
@@ -112,20 +110,10 @@ void setup()
 
     SerialX.begin(9600);
     atask_initialize();
-    
-    uart_initialize();
-    uart_p = uart_get_data_ptr();
-    send_p = rfm_send_get_data_ptr();
-
-    rf69p = &rf69;
-    rfm69_initialize(&rf69);
-    rfm_send_radiate_msg(__APP__);
-
     io_initialize();
-    // Hard Reset the RFM module
-    
     initialize_tasks();
-
+    uint8_t key[] = RFM69_KEY;
+    rfm69_modem.initialize(key);
 
     #ifdef ADAFRUIT_FEATHER_M0
     // Initialze WDT with a 2 sec. timeout
@@ -134,8 +122,6 @@ void setup()
     #ifdef PRO_MINI_RFM69
     //watchdog.set_timeout(4);
     #endif
-
-
 }
 
 
@@ -145,10 +131,15 @@ void loop()
     atask_run();  
 }
 
+void modem_task(void)
+{
+    rfm69_modem.modem_task();
+}
+
 
 void rfm_receive_task(void) 
 {
-    rfm_receive_message();
+    rfm69_receive_message();
     #ifdef ADAFRUIT_FEATHER_M0
     wdt_reset();
     #endif
@@ -160,29 +151,12 @@ void rfm_receive_task(void)
 
 void run_100ms(void)
 {
-    static uint8_t ms100 = 0;
-    if (++ms100 >= 10 )
-    {
-        ms100 = 0;
-        if (++MyTime.second > 59 )
-        {
-          MyTime.second = 0;
-          if (++MyTime.minute > 59 )
-          {    
-            MyTime.minute = 0;
-            if (++MyTime.hour > 23)
-            {
-                MyTime.hour = 0;
-            }
-          }   
-      }
-    }
     io_run_100ms();
 }
 
 void debug_print_task(void)
 {
-  atask_print_status(true);
+  //atask_print_status(true);
 }
 
 #ifdef SEND_TEST_MSG

@@ -1,16 +1,12 @@
-#include "main.h"
 #include "uart.h"
 #include "json.h"
 #include "rfm69.h"
 #include "io.h"
-#include "atask.h"
 
 uart_msg_st         uart;
 extern module_data_st  module;
 
 void uart_rx_task(void);
-
-atask_st uart_rx_h        = {"UART Rx Task   ", 100,0, 0, 255, 0, 1, uart_rx_task};
 
 
 uart_msg_st *uart_get_data_ptr(void)
@@ -21,7 +17,6 @@ uart_msg_st *uart_get_data_ptr(void)
 void uart_initialize(void)
 {
     uart.rx.avail = false;
-    atask_add_new(&uart_rx_h);
 }
 
 void uart_read_uart(void)
@@ -31,7 +26,9 @@ void uart_read_uart(void)
         String Str;
         io_led_flash(LED_INDX_BLUE,20);
         Str  = SerialX.readStringUntil('\n');
+        #ifdef MODEM_DEBUG_PRINT
         Serial.println(Str);
+        #endif  
         if (Str.length()> 0)
         {
             Str.trim();
@@ -40,7 +37,7 @@ void uart_read_uart(void)
             uart.rx.avail = true;
             //uart.rx.str.remove(uart.rx.str.length()-1);
         }
-        #ifdef DEBUG_PRINT
+        #ifdef MODEM_DEBUG_PRINT
         Serial.print("rx is available: "); Serial.println(uart.rx.msg);
         #endif        
     } 
@@ -71,7 +68,7 @@ void uart_parse_rx_frame(void)
 
     if (do_continue)
     {   
-        #ifdef DEBUG_PRINT
+        #ifdef MODEM_DEBUG_PRINT
         Serial.print("Buffer frame is OK\n");
         #endif
 
@@ -126,8 +123,8 @@ void uart_build_node_from_rx_str(void)
 void uart_build_node_tx_str(void)
 {
     uart_prepare_reply();
-    if(rfm_receive_message_is_avail()){
-        rfm_receive_msg_st *receive_p = rfm_receive_get_data_ptr();
+    if(rfm69_receive_message_is_avail()){
+        rfm_receive_msg_st *receive_p = rfm69_get_receive_data_ptr();
         String StrRadio = (char*) receive_p->radio_msg;  
         String StrTx ="";
         json_pick_data_from_rx(&uart);
@@ -153,7 +150,7 @@ void uart_build_node_tx_str(void)
 
 void uart_build_raw_tx_str(void)
 {
-    rfm_receive_msg_st *receive_p = rfm_receive_get_data_ptr();
+    rfm_receive_msg_st *receive_p = rfm69_get_receive_data_ptr();
     // uart.tx.str = "<#X1r:";
     uart_prepare_reply();
     memcpy(&uart.tx.msg[UART_FRAME_POS_DATA],(char*) receive_p->radio_msg, MAX_MESSAGE_LEN);
@@ -166,16 +163,16 @@ void uart_rx_send_rfm_from_raw(void)
     uart.rx.msg[uart.rx.len-1] = 0x00;
     // Serial.print("uart_rx_send_rfm_from_raw: "); Serial.println(uart.rx.msg);
     // Serial.print("...len: "); Serial.println(uart.rx.len);
-    rfm_send_radiate_msg(&uart.rx.msg[UART_FRAME_POS_DATA]);
+    rfm69_radiate_msg(&uart.rx.msg[UART_FRAME_POS_DATA]);
 }
 
 void uart_rx_send_rfm_from_node(void)
 {
     //uart.rx.str = uart.rx.str.substring(6,uart.rx.len - 1);
     uart_build_node_from_rx_str();
-    rfm_send_msg_st *send_p = rfm_send_get_data_ptr();
+    rfm_send_msg_st *send_p = rfm69_get_send_data_ptr();
     json_convert_uart_node_to_json(send_p->radio_msg, &uart);
-    rfm_send_radiate_msg(send_p->radio_msg);
+    rfm69_radiate_msg(send_p->radio_msg);
 }
 
 
@@ -193,13 +190,13 @@ void uart_exec_cmnd(uart_cmd_et ucmd)
             break;
         case UART_CMD_GET_AVAIL:
             uart_prepare_reply(); 
-            if(rfm_receive_message_is_avail()) uart.tx.msg[UART_FRAME_POS_DATA] = '1';
+            if(rfm69_receive_message_is_avail()) uart.tx.msg[UART_FRAME_POS_DATA] = '1';
             else uart.tx.msg[UART_FRAME_POS_DATA] = '0';
             SerialX.println(uart.tx.msg);
             break;
         case UART_CMD_GET_RSSI:
             uart_prepare_reply(); 
-            if(rfm_receive_message_is_avail()){
+            if(rfm69_receive_message_is_avail()){
                 String Str = String(rfm69_get_last_rssi());
                 Str.toCharArray(&uart.tx.msg[UART_FRAME_POS_DATA], UART_MAX_REPLY_LEN - UART_FRAME_POS_DATA -3);
                 //Serial.println(uart.tx.msg);
@@ -212,13 +209,16 @@ void uart_exec_cmnd(uart_cmd_et ucmd)
             break;
         case UART_CMD_READ_RAW:
             uart_build_raw_tx_str();
-            rfm_receive_clr_message_flag();
+            rfm69_clr_receive_message_flag();
             SerialX.println(uart.tx.msg);          
             break;
         case UART_CMD_READ_NODE:
             uart_build_node_tx_str();
-            rfm_receive_clr_message_flag();
+            rfm69_clr_receive_message_flag();
             SerialX.println(uart.tx.msg);          
+            break;
+        case UART_CMD_SET_PARAM:
+            rfm69_set_transparent(uart.rx.msg[UART_FRAME_POS_DATA] == '1');
             break;
 
     }
@@ -227,46 +227,49 @@ void uart_exec_cmnd(uart_cmd_et ucmd)
 
 void uart_print_rx_metadata(void)
 {
-    Serial.print("Length      "); Serial.println(uart.rx.len);
-    Serial.print("Avail       "); Serial.println(uart.rx.avail);
-    Serial.print("Status      "); Serial.println(uart.rx.status);
-    Serial.print("Tag         "); Serial.println(uart.rx.frame.tag);
-    Serial.print("Address     "); Serial.println(uart.rx.frame.addr);
-    Serial.print("Function    "); Serial.println(uart.rx.frame.function);
-    Serial.print("Index       "); Serial.println(uart.rx.frame.index);
-    Serial.print("Action      "); Serial.println(uart.rx.frame.action);
-    Serial.print("Format      "); Serial.println(uart.rx.format);
+    #ifdef MODEM_DEBUG_PRINT
+    Serial.print(F("Length      ")); Serial.println(uart.rx.len);
+    Serial.print(F("Avail       ")); Serial.println(uart.rx.avail);
+    Serial.print(F("Status      ")); Serial.println(uart.rx.status);
+    Serial.print(F("Tag         ")); Serial.println(uart.rx.frame.tag);
+    Serial.print(F("Address     ")); Serial.println(uart.rx.frame.addr);
+    Serial.print(F("Function    ")); Serial.println(uart.rx.frame.function);
+    Serial.print(F("Index       ")); Serial.println(uart.rx.frame.index);
+    Serial.print(F("Action      ")); Serial.println(uart.rx.frame.action);
+    Serial.print(F("Format      ")); Serial.println(uart.rx.format);
+    #endif
 }    
 
 
 void uart_rx_task(void)
 {
-    switch(uart_rx_h.state)
+    static uint8_t rx_state = 0;
+    switch(rx_state)
     {
         case 0:
-            uart_rx_h.state = 10;
+            rx_state = 10;
             break;
         case 10:
             uart_read_uart();    // if available -> uart->prx.str uart->rx.avail
-            if(uart.rx.avail) uart_rx_h.state = 20;
+            if(uart.rx.avail) rx_state = 20;
             break;
         case 20:
                 uart_parse_rx_frame();
-                #ifdef DEBUG_PRINT
+                #ifdef MODEM_DEBUG_PRINT
                 Serial.println(uart.rx.msg);
                 uart_print_rx_metadata();
                 #endif
                 uart.rx.avail = false;
-                Serial.print("uart.rx.status="); Serial.println(uart.rx.status);
-                if (uart.rx.status == STATUS_CORRECT_FRAME) uart_rx_h.state = 30;
-                else uart_rx_h.state = 10;
+                //Serial.print("uart.rx.status="); Serial.println(uart.rx.status);
+                if (uart.rx.status == STATUS_CORRECT_FRAME) rx_state = 30;
+                else rx_state = 10;
             break;
         case 30:
             uart_exec_cmnd(uart.rx.frame.function);
-            uart_rx_h.state = 10;
+            rx_state = 10;
             break;
         case 40:
-            uart_rx_h.state = 10;
+            rx_state = 10;
             break;
     }
 }

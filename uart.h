@@ -1,5 +1,7 @@
 #ifndef __UART_H__
 #define __UART_H__
+#include "rfm69.h"
+
 #define UART_MAX_BLOCK_LEN  8
 #define UART_MAX_REPLY_LEN  80
 
@@ -33,6 +35,7 @@ typedef enum
     UART_CMD_READ_RAW       = 'R',
     UART_CMD_READ_NODE      = 'D', 
     UART_CMD_GET_RSSI       = 'I',
+    UART_CMD_SET_PARAM      = 'S',
 } uart_cmd_et;
 
 typedef enum
@@ -135,5 +138,8 @@ void uart_rx_build_rfm_array(void);
 /// @param  UART command
 /// @return
 void uart_exec_cmnd(uart_cmd_et ucmd);
+
+
+void uart_rx_task(void);
 
 #endif

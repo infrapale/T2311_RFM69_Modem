@@ -14,7 +14,7 @@ void xxsend_rfm69_message(String str)
   char cbuff[MAX_MESSAGE_LEN];
     str.toCharArray(cbuff,MAX_MESSAGE_LEN);
     //Serial.println(cbuff);
-    rfm_send_radiate_msg(cbuff);
+    rfm69_radiate_msg(cbuff);
 }
 
 
@@ -153,12 +153,12 @@ void xxrfm_send_transmit(rfm_send_msg_st *rx_msg)
             //<#X1T-{"Z":"OD_1","S":"Temp","V":23.1,"R":"-"}>\n
 
             payload.toCharArray(send_msg.radio_msg, MAX_MESSAGE_LEN);
-            rfm_send_radiate_msg(send_msg.radio_msg);
+            rfm69_radiate_msg(send_msg.radio_msg);
             break;
         case MSG_FORMAT_SENSOR_JSON:
             //<#X1TSOD_1;Temp;23.1;->\n
             //json_decode_to_tab_str(&payload, send_msg.radio_msg);
-            rfm_send_radiate_msg(send_msg.radio_msg);
+            rfm69_radiate_msg(send_msg.radio_msg);
             break;
     }
 }
